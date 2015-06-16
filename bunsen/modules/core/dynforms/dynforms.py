@@ -19,6 +19,7 @@ __default_fields__ = ["Boolean", "Date", "DateTime", "Decimal", "File", "Float",
                       "Radio", "Select", "SelectMultiple", "Submit", "TextArea", "String", "Form"]
 from flask_wtf import Form
 from flask_wtf.form import _Auto
+from bunsen.modules.core.dynforms.exceptions import FormNotFound
 
 
 class DynForms(object):
@@ -52,7 +53,7 @@ class DynForms(object):
         pass
 
 
-class DynamicForm(Form):
+class DynamicForm(object):
     """
     The workhorse class of the DynForms extension. Extends the WTForms module by
     providing methods to store a form in a database and generate a Form object based on
@@ -63,23 +64,29 @@ class DynamicForm(Form):
 
     """
 
-    def __init__(self, formname="", formdata=_Auto,*args, **kwargs):
-        """
-                The constructor method takes care of loading a form from the database
-                :param formname: The name of the form to pull from the database
-                :param formid: The id of the form in the database to pull from
-                :param args:
-                :param kwargs:
-                """
+    def __init__(self, form_name=None,*args, **kwargs):
+        self.form_name = form_name
+        self.wtform = Form()
+        self.database_form = None
+
+    def fetch(self, form_name=None):
         from bunsen.modules.core.dynforms.models import Forms
+        if form_name is None and self.form_name is not None:
+            # fetch the form details from the database with the self.form_name
+            form_name = self.form_name
 
-        if formname != "":
-            self.form_model_object = Forms.query.filter_by(name=formname).first()
-        else:
-            raise Exception("No valid form identifier given")
-        if self.form_model_object is None:
-            # The record didn't exist, so we'll make a new one
-            self.form_model_object = Forms(formname)
+        self.database_form = Forms.query.filter_by(name=form_name).first()
 
-        # Call the super's init method to treat this as a form
-        super(DynamicForm, self).__init__(*args, **kwargs)
+        if self.database_form is None:
+            raise FormNotFound("The form {form_name} was not found in the database".format(form_name=form_name))
+
+        # call the form factory to construct a WTForms object to return
+        return self._construct()
+
+    def _construct(self):
+        """
+        Construct a new form from the database and return it
+        :returns : Form
+        """
+        # add the form fields
+        # TODO: Finish the DynamicForm._construct method
