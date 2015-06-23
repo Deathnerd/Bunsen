@@ -17,7 +17,7 @@ blueprint = Blueprint("pages", __name__, url_prefix="/")
 
 # put dynamic routes here
 @blueprint.route("/", defaults={"slug": None})
-@blueprint.route("/<string:slug>")
+@blueprint.route("<string:slug>")
 def page(slug):
     # first check for index
     if slug is None:  # if the slug is a None object, then this is the index page

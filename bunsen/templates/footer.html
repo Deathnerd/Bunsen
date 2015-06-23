@@ -6,9 +6,12 @@
 
         <ul class="footer-nav">
             
-            <li><a href="#">About</a></li>
+            <li><a href="{{ bunsen_page("about") }}">About</a></li>
             
             <li><a href="mailto:wes.gilleland@gmail.com">Contact</a></li>
+            <li><a href="{{ bunsen_page("index", foo="bar") }}">Home</a></li>
+            <li><a href="{{ bunsen_page("test2", foo="bar") }}">Test 2</a></li>
+
         </ul>
     </small>
 </footer>

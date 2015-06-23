@@ -43,6 +43,8 @@ def register_extensions(app):
     debug_toolbar.init_app(app)
     migrate.init_app(app, db)
     # request_errors.init_app(app)
+
+    register_template_globals(app)
     return None
 
 
@@ -70,4 +72,9 @@ def register_bunsen_admin(*args, **kwargs):
     """
     for view in args:
         bunsen_admin.add_view(view(kwargs['session']))
+    return None
+
+def register_template_globals(app):
+    from bunsen.modules.core.pages.extensions import generate_jinja_extensions
+    generate_jinja_extensions(app)
     return None
